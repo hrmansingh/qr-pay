@@ -1,39 +1,113 @@
-# qr-pay
-QR Pay Analytics  QR Pay Analytics is a unified QR-based payment and analytics platform designed for small and micro-businesses. It enables businesses to accept digital payments through product-level QR codes while capturing rich, actionable insights about customer intent and purchasing behavior.
+# QRPay - Payment Analytics Dashboard
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+A beautiful and professional QR Payment Analytics Platform built with Next.js, TypeScript, and Tailwind CSS.
+
+## Features
+
+- 📊 **Comprehensive Dashboard** - Real-time analytics and KPI tracking
+- 📱 **Responsive Design** - Optimized for desktop, tablet, and mobile devices
+- 🎨 **Modern UI** - Clean, professional interface with smooth animations
+- 📈 **Interactive Charts** - Sales trends and product performance visualization
+- 🏪 **Business Management** - Multi-business account management
+- 📦 **Product Analytics** - QR code generation and conversion tracking
+- 🎯 **Performance Metrics** - Conversion rates, revenue tracking, and more
+
+## Tech Stack
+
+- **Framework**: Next.js 16 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS 4
+- **UI Components**: Radix UI primitives
+- **Charts**: Recharts
+- **Icons**: Lucide React
+- **Utilities**: class-variance-authority, clsx, tailwind-merge
 
 ## Getting Started
 
-First, run the development server:
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+2. **Run the development server**:
+   ```bash
+   npm run dev
+   ```
+
+3. **Open your browser** and navigate to [http://localhost:3000](http://localhost:3000)
+
+## Project Structure
+
+```
+qr-pay/
+├── app/
+│   ├── globals.css          # Global styles and CSS variables
+│   ├── layout.tsx           # Root layout component
+│   └── page.tsx             # Home page
+├── components/
+│   ├── ui/                  # Reusable UI components
+│   │   ├── avatar.tsx
+│   │   ├── badge.tsx
+│   │   ├── button.tsx
+│   │   ├── card.tsx
+│   │   ├── dropdown-menu.tsx
+│   │   ├── input.tsx
+│   │   ├── tabs.tsx
+│   │   └── utils.ts
+│   ├── BusinessesManagement.tsx
+│   ├── Dashboard.tsx
+│   ├── DashboardLayout.tsx
+│   └── ProductsAnalytics.tsx
+└── package.json
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Dashboard Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Overview Tab
+- **KPI Cards**: Total Sales, Revenue, QR Scans, Conversion Rate
+- **Sales Chart**: 7-day sales performance trend
+- **Product Chart**: Top-selling products by revenue
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Products Tab
+- **Product Grid**: Visual product cards with key metrics
+- **Search & Filter**: Find products quickly
+- **QR Code Generation**: Generate QR codes for products
+- **Performance Metrics**: Scans, purchases, conversion rates
 
-## Learn More
+### Businesses Tab
+- **Business Cards**: Visual business overview
+- **Status Tracking**: Active/inactive business status
+- **Revenue Metrics**: Sales and revenue per business
+- **Quick Actions**: View analytics and manage businesses
 
-To learn more about Next.js, take a look at the following resources:
+## Customization
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Colors
+The app uses a professional color scheme with CSS custom properties. You can customize colors in `app/globals.css`:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```css
+:root {
+  --primary: #4f46e5;        /* Indigo primary color */
+  --secondary: #f1f5f9;      /* Light gray secondary */
+  --accent: #f1f5f9;         /* Accent color */
+  /* ... more color variables */
+}
+```
 
-## Deploy on Vercel
+### Components
+All UI components are built with Radix UI primitives and can be easily customized. They're located in the `components/ui/` directory.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Scripts
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+
+## License
+
+This project is private and proprietary.
+
+---
+
+Built with ❤️ using Next.js and modern web technologies.
