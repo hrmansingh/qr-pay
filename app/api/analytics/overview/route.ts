@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 
 export async function GET(request: NextRequest) {
   try {
@@ -96,7 +96,7 @@ async function getRevenueByBusiness(startDate?: string | null, endDate?: string 
     if (!businessMap.has(key)) {
       businessMap.set(key, {
         business_id: payment.business_id,
-        business_name: payment.businesses?.name || 'Unknown',
+        business_name: Array.isArray(payment.businesses) ? payment.businesses[0]?.name : (payment.businesses as any)?.name || 'Unknown',
         revenue: 0,
         payment_count: 0
       })
@@ -130,7 +130,7 @@ async function getRevenueByProduct(startDate?: string | null, endDate?: string |
 
   const productMap = new Map()
   
-  payments.forEach(payment => {
+  payments.forEach((payment: any) => {
     const key = payment.product_id
     if (!productMap.has(key)) {
       productMap.set(key, {

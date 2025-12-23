@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import { withErrorHandling, parseDateRange } from '@/lib/middleware/api-middleware'
 
 export const GET = withErrorHandling(async (
@@ -91,7 +91,7 @@ export const GET = withErrorHandling(async (
     if (!businessMap.has(key)) {
       businessMap.set(key, {
         business_id: payment.business_id,
-        business_name: payment.businesses?.name || 'Unknown',
+        business_name: Array.isArray(payment.businesses) ? payment.businesses[0]?.name : (payment.businesses as any)?.name || 'Unknown',
         revenue: 0,
         payment_count: 0
       })
@@ -108,7 +108,7 @@ export const GET = withErrorHandling(async (
     if (!productMap.has(key)) {
       productMap.set(key, {
         product_id: payment.product_id,
-        product_name: payment.products?.name || 'Unknown',
+        product_name: Array.isArray(payment.products) ? payment.products[0]?.name : (payment.products as any)?.name || 'Unknown',
         revenue: 0,
         payment_count: 0
       })

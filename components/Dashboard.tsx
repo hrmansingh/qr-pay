@@ -76,7 +76,13 @@ const chartConfig = {
   },
 };
 
-export function Dashboard() {
+interface DashboardProps {
+  businessId: string;
+}
+
+export function Dashboard({ businessId }: DashboardProps) {
+  // In the future, use businessId to fetch real analytics
+  
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* KPI Cards */}
@@ -188,8 +194,8 @@ export function Dashboard() {
                 type="monotone" 
                 dataKey="revenue" 
                 stroke="var(--color-revenue)" 
-                fill="var(--color-revenue)" 
-                fillOpacity={0.3}
+                strokeWidth={2} 
+                dot={{ fill: "var(--color-sales)", r: 4 }} 
               />
             </AreaChart>
           </ChartContainer>

@@ -1,5 +1,5 @@
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
 
 export async function GET(request: NextRequest) {
   try {
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     if (startDate) query = query.gte('created_at', startDate)
     if (endDate) query = query.lte('created_at', endDate)
 
-    const { data: payments, error } = await query
+    const { data: payments, error }:any = await query
 
     if (error) {
       console.error('Error fetching business analytics:', error)
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     // Aggregate by business
     const businessMap = new Map()
     
-    payments.forEach(payment => {
+    payments.forEach((payment:any) => {
       const key = payment.business_id
       if (!businessMap.has(key)) {
         businessMap.set(key, {
@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
     // Convert to array and calculate metrics
     const businessAnalytics = Array.from(businessMap.values()).map(business => {
       const topProducts = Array.from(business.products.values())
-        .sort((a, b) => b.revenue - a.revenue)
+        .sort((a:any, b:any) => b.revenue - a.revenue)
         .slice(0, 5)
 
       return {

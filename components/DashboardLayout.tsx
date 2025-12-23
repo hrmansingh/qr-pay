@@ -1,23 +1,85 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback } from "./ui/avatar";
-import { ChevronDown, LayoutDashboard, Package, Store, Menu, X } from "lucide-react";
+import { ChevronDown, LayoutDashboard, Package, Store, LogOut, Loader2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "./ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Dashboard } from "./Dashboard";
 import { ProductsAnalytics } from "./ProductsAnalytics";
 import { BusinessesManagement } from "./BusinessesManagement";
+import { api } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 
 export function DashboardLayout() {
-  const [selectedBusiness, setSelectedBusiness] = useState("AudioTech Store");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const router = useRouter();
+  const [businesses, setBusinesses] = useState<any[]>([]);
+  const [selectedBusiness, setSelectedBusiness] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const checkUserAndLoadData = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          router.push("/auth/login");
+          return;
+        }
+        setUser(user);
+
+        // Fetch businesses (In a real app, filter by owner_id or user role context)
+        // Currently api.businesses.list() returns all, we should probably filter client side or update API.
+        // For MVP assuming the list returns accessible businesses or we filter.
+        // Wait, the API returns ALL businesses. We must filter by user.id if we want logic to make sense.
+        // But let's check api.businesses.list implementation again.
+        // It calls /api/businesses (GET).
+        // Let's assume for now we filter client side to avoid editing API if not needed, 
+        // OR better, we edit the API later. For now, let's just fetch.
+        
+        const { businesses: allBusinesses } = await api.businesses.list();
+        // Simple filter for MVP:
+        const myBusinesses = allBusinesses.filter((b: any) => b.owner_id === user.id);
+
+        if (myBusinesses.length === 0) {
+          router.push("/onboarding");
+          return;
+        }
+
+        setBusinesses(myBusinesses);
+        setSelectedBusiness(myBusinesses[0]);
+      } catch (error) {
+        console.error("Failed to load dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkUserAndLoadData();
+  }, [router]);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/auth/login");
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    );
+  }
+
+  if (!selectedBusiness) return null;
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -33,19 +95,19 @@ export function DashboardLayout() {
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="hidden md:flex items-center gap-2 bg-white rounded-lg text-gray-700">
                   <Store className="w-4 h-4 text-gray-500" />
-                  <span className="max-w-[150px] lg:max-w-none truncate">{selectedBusiness}</span>
+                  <span className="max-w-[150px] lg:max-w-none truncate">{selectedBusiness.name}</span>
                   <ChevronDown className="w-4 h-4 text-gray-500" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-56 bg-white">
-                <DropdownMenuItem onClick={() => setSelectedBusiness("AudioTech Store")}>
-                  AudioTech Store
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSelectedBusiness("Mobile Accessories Hub")}>
-                  Mobile Accessories Hub
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSelectedBusiness("Tech Gadgets Pro")}>
-                  Tech Gadgets Pro
+                {businesses.map((business) => (
+                  <DropdownMenuItem key={business.id} onClick={() => setSelectedBusiness(business)}>
+                    {business.name}
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push("/onboarding")}>
+                  + Create New Business
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -53,9 +115,21 @@ export function DashboardLayout() {
 
           {/* Profile Avatar */}
           <div className="flex items-center gap-3">
-            <Avatar className="h-8 w-8 md:h-9 md:w-9 cursor-pointer">
-              <AvatarFallback className="bg-blue-100 text-blue-600 text-xs md:text-sm">JD</AvatarFallback>
-            </Avatar>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Avatar className="h-8 w-8 md:h-9 md:w-9 cursor-pointer">
+                  <AvatarFallback className="bg-blue-100 text-blue-600 text-xs md:text-sm">
+                    {user?.user_metadata?.full_name?.substring(0, 2).toUpperCase() || "U"}
+                  </AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-white">
+                <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
@@ -66,20 +140,20 @@ export function DashboardLayout() {
               <Button variant="outline" className="w-full flex items-center justify-between gap-2 bg-white rounded-lg text-gray-700">
                 <div className="flex items-center gap-2">
                   <Store className="w-4 h-4 text-gray-500" />
-                  <span className="truncate">{selectedBusiness}</span>
+                  <span className="truncate">{selectedBusiness.name}</span>
                 </div>
                 <ChevronDown className="w-4 h-4 text-gray-500" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-[calc(100vw-2rem)] bg-white">
-              <DropdownMenuItem onClick={() => setSelectedBusiness("AudioTech Store")}>
-                AudioTech Store
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSelectedBusiness("Mobile Accessories Hub")}>
-                Mobile Accessories Hub
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSelectedBusiness("Tech Gadgets Pro")}>
-                Tech Gadgets Pro
+              {businesses.map((business) => (
+                <DropdownMenuItem key={business.id} onClick={() => setSelectedBusiness(business)}>
+                  {business.name}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => router.push("/onboarding")}>
+                + Create New Business
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -117,15 +191,15 @@ export function DashboardLayout() {
           </div>
 
           <TabsContent value="overview" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
-            <Dashboard />
+            <Dashboard businessId={selectedBusiness.id} />
           </TabsContent>
 
           <TabsContent value="products" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
-            <ProductsAnalytics />
+            <ProductsAnalytics businessId={selectedBusiness.id} />
           </TabsContent>
 
           <TabsContent value="businesses" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
-            <BusinessesManagement />
+            <BusinessesManagement userBusinesses={businesses} />
           </TabsContent>
         </Tabs>
       </main>

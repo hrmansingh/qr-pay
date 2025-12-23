@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import { withErrorHandling, validateRequiredFields } from '@/lib/middleware/api-middleware'
 
 export const POST = withErrorHandling(async (request: NextRequest) => {
@@ -23,7 +23,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     )
   }
 
-  const results = {
+  const results: { success: any[]; failed: any[]; total: number } = {
     success: [],
     failed: [],
     total: profile_ids.length

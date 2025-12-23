@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 
 export async function GET(request: NextRequest) {
   try {
@@ -43,8 +43,8 @@ export async function GET(request: NextRequest) {
       if (!productMap.has(key)) {
         productMap.set(key, {
           product_id: payment.product_id,
-          product_name: payment.products?.name || 'Unknown Product',
-          base_price: payment.products?.base_price || 0,
+          product_name: Array.isArray(payment.products) ? payment.products[0]?.name : (payment.products as any)?.name || 'Unknown Product',
+          base_price: Array.isArray(payment.products) ? payment.products[0]?.base_price : (payment.products as any)?.base_price || 0,
           total_revenue: 0,
           total_sales: 0,
           average_price: 0,
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
       const product = productMap.get(key)
       product.total_revenue += payment.amount
       product.total_sales += 1
-      product.businesses.add(payment.businesses?.name || 'Unknown Business')
+      product.businesses.add(Array.isArray(payment.businesses) ? payment.businesses[0]?.name : (payment.businesses as any)?.name || 'Unknown Business')
     })
 
     // Convert to array and calculate averages

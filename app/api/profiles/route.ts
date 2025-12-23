@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
 import { withErrorHandling, validateRequiredFields } from '@/lib/middleware/api-middleware'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 
 export const GET = withErrorHandling(async (request: NextRequest) => {
   const { searchParams } = new URL(request.url)

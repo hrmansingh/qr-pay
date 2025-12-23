@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import { generateQRCode, generateQRCodeBuffer } from '@/lib/qr-generator'
 
 export async function POST(request: NextRequest) {
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
       // Return QR code as PNG image
       const qrBuffer = await generateQRCodeBuffer(qrData)
       
-      return new NextResponse(qrBuffer, {
+      return new NextResponse(new Uint8Array(qrBuffer), {
         headers: {
           'Content-Type': 'image/png',
           'Content-Disposition': `attachment; filename="qr-${business_id}-${product_id}.png"`
