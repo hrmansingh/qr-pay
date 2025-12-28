@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import { Business, Product, BusinessProduct } from '@/lib/types'
 
 export class BusinessService {
@@ -46,7 +46,7 @@ export class BusinessService {
       throw new Error(`Product not assigned to business: ${bpError.message}`)
     }
 
-    return businessProduct.price_override || businessProduct.products.base_price
+    return businessProduct.price_override || (businessProduct.products as any).base_price
   }
 
   static async validateBusinessProduct(businessId: string, productId: string): Promise<boolean> {

@@ -19,6 +19,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "crypto": "^1.0.1",
+    "dotenv": "^17.2.3",
     "lightswind": "^3.1.20",
     "lucide-react": "^0.562.0",
     "next": "16.0.10",

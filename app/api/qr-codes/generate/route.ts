@@ -5,7 +5,7 @@ import { generateQRCode, generateQRCodeBuffer } from '@/lib/qr-generator'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { business_id, product_id, format = 'json' } = body
+    const { business_id, product_id, amount, format = 'json' } = body
     
     if (!business_id || !product_id) {
       return NextResponse.json(
@@ -33,8 +33,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Calculate final price (use override if available, otherwise base price)
-    const finalPrice = businessProduct.price_override || businessProduct.products.base_price
+    // Calculate final price (use custom amount if provided, otherwise use override or base price)
+    let finalPrice: number
+    if (amount && amount > 0) {
+      finalPrice = amount
+    } else {
+      finalPrice = businessProduct.price_override || businessProduct.products.base_price
+    }
     
     const merchantUPI = process.env.MERCHANT_UPI_ID!
     const merchantName = process.env.MERCHANT_NAME!
@@ -54,35 +59,21 @@ export async function POST(request: NextRequest) {
       merchantName
     }
 
-    // Check if QR code already exists
-    let { data: existingQR } = await supabaseAdmin
+    // Generate new QR code for each request (since amount can vary)
+    const qrCodeDataURL = await generateQRCode(qrData)
+    
+    // Store QR code scan record for analytics
+    const { error: insertError } = await supabaseAdmin
       .from('qr_scans')
-      .select('*')
-      .eq('business_id', business_id)
-      .eq('product_id', product_id)
-      .single()
+      .insert([{
+        business_id,
+        product_id,
+        qr_data: `${product_id}|${business_id}|${finalPrice}` // Store metadata for tracking
+      }])
 
-    let qrCodeDataURL: string
-
-    if (existingQR && existingQR.qr_data) {
-      qrCodeDataURL = existingQR.qr_data
-    } else {
-      // Generate new QR code
-      qrCodeDataURL = await generateQRCode(qrData)
-      
-      // Store QR code metadata
-      const { error: insertError } = await supabaseAdmin
-        .from('qr_scans')
-        .upsert([{
-          business_id,
-          product_id,
-          qr_data: qrCodeDataURL
-        }])
-
-      if (insertError) {
-        console.error('Error storing QR code:', insertError)
-        // Continue anyway, QR code was generated successfully
-      }
+    if (insertError) {
+      console.error('Error storing QR code scan:', insertError)
+      // Continue anyway, QR code was generated successfully
     }
 
     if (format === 'image') {
@@ -92,7 +83,7 @@ export async function POST(request: NextRequest) {
       return new NextResponse(new Uint8Array(qrBuffer), {
         headers: {
           'Content-Type': 'image/png',
-          'Content-Disposition': `attachment; filename="qr-${business_id}-${product_id}.png"`
+          'Content-Disposition': `attachment; filename="qr-${business_id}-${product_id}-${finalPrice}.png"`
         }
       })
     }
@@ -105,7 +96,8 @@ export async function POST(request: NextRequest) {
       amount: finalPrice,
       business_name: businessProduct.businesses.name,
       product_name: businessProduct.products.name,
-      merchant_upi: merchantUPI
+      merchant_upi: merchantUPI,
+      merchant_name: merchantName
     })
 
   } catch (error) {

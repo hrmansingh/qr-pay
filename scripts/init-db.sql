@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS products (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     name TEXT NOT NULL,
     base_price DECIMAL(10,2) NOT NULL CHECK (base_price >= 0),
+    currency TEXT DEFAULT 'INR' NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

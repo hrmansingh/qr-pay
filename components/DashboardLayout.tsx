@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Dashboard } from "./Dashboard";
 import { ProductsAnalytics } from "./ProductsAnalytics";
 import { BusinessesManagement } from "./BusinessesManagement";
+import { Footer } from "./Footer";
 import { api } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 
@@ -203,6 +204,9 @@ export function DashboardLayout() {
           </TabsContent>
         </Tabs>
       </main>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

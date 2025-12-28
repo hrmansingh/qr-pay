@@ -5,8 +5,7 @@ import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Badge } from "./ui/badge";
-import { Search, Filter, QrCode, Loader2 } from "lucide-react";
-import { api } from "@/lib/api";
+import { Search, Filter, Loader2 } from "lucide-react";
 import { CreateProductDialog } from "./CreateProductDialog";
 import { ProductQRDialog } from "./ProductQRDialog";
 
@@ -22,12 +21,21 @@ export function ProductsAnalytics({ businessId }: ProductsAnalyticsProps) {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const { products } = await api.products.list();
-      // Filter by businessId if API doesn't handle it yet (assuming API returns all for now, or just returns accessible ones)
-      // Since our API currently returns ALL products, we filter here for MVP correctness if possible.
-      // But typically API should handle filtering.
-      // For this MVP, we will display all fetched products as "belonging" to the business or just display them.
-      // Ideally we check relation.
+      // Fetch products assigned to this business
+      const response = await fetch(`/api/business-products?business_id=${businessId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch business products');
+      }
+      const { businessProducts } = await response.json();
+      
+      // Extract products from business_products relationship
+      const products = businessProducts.map((bp: any) => ({
+        ...bp.products,
+        id: bp.product_id, // Use the product_id as the id
+        price_override: bp.price_override,
+        business_product_id: bp.id
+      }));
+      
       setProducts(products);
     } catch (error) {
       console.error("Failed to fetch products", error);
@@ -88,14 +96,14 @@ export function ProductsAnalytics({ businessId }: ProductsAnalyticsProps) {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {loading ? (
-                <tr>
+                <tr key="loading">
                   <td colSpan={7} className="py-8 text-center text-gray-500">
                     <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
                     Loading products...
                   </td>
                 </tr>
               ) : filteredProducts.length === 0 ? (
-                <tr>
+                <tr key="empty">
                   <td colSpan={7} className="py-8 text-center text-gray-500">
                     No products found. Create one to get started.
                   </td>
@@ -104,7 +112,7 @@ export function ProductsAnalytics({ businessId }: ProductsAnalyticsProps) {
                 filteredProducts.map((product) => (
                   <tr key={product.id} className="hover:bg-gray-50">
                     <td className="py-4 px-4 text-sm text-gray-900">{product.name}</td>
-                    <td className="py-4 px-4 text-sm text-gray-900 text-right">${product.base_price?.toFixed(2) || '0.00'}</td>
+                    <td className="py-4 px-4 text-sm text-gray-900 text-right">₹{(product.price_override || product.base_price)?.toFixed(2) || '0.00'}</td>
                     <td className="py-4 px-4 text-sm text-gray-900 text-right">{product.scans || 0}</td>
                     <td className="py-4 px-4 text-sm text-gray-900 text-right">{product.purchases || 0}</td>
                     <td className="py-4 px-4 text-right">
@@ -115,10 +123,10 @@ export function ProductsAnalytics({ businessId }: ProductsAnalyticsProps) {
                       </Badge>
                     </td>
                     <td className="py-4 px-4 text-sm font-semibold text-blue-600 text-right">
-                      $0.00
+                      ₹0.00
                     </td>
                     <td className="py-4 px-4 text-right">
-                      <ProductQRDialog product={product} />
+                      <ProductQRDialog product={product} businessId={businessId} />
                     </td>
                   </tr>
                 ))

@@ -6,6 +6,7 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
+  type ChartConfig,
 } from "./lightswind/chart";
 import {
   LineChart,
@@ -64,17 +65,17 @@ const radarData = [
 const chartConfig = {
   sales: {
     label: "Sales",
-    color: "#5b5ff9",
+    color: "hsl(var(--chart-1))",
   },
   revenue: {
     label: "Revenue",
-    color: "#8884d8",
+    color: "hsl(var(--chart-2))",
   },
   profit: {
     label: "Profit",
-    color: "#82ca9d",
+    color: "hsl(var(--chart-3))",
   },
-};
+} satisfies ChartConfig;
 
 interface DashboardProps {
   businessId: string;
@@ -104,7 +105,7 @@ export function Dashboard({ businessId }: DashboardProps) {
             <div className="text-sm text-gray-600">Total Revenue</div>
             <DollarSign className="w-4 h-4 text-gray-400" />
           </div>
-          <div className="text-2xl font-bold text-blue-600 mb-2">$17,200</div>
+          <div className="text-2xl font-bold text-blue-600 mb-2">₹17,200</div>
           <div className="text-xs text-green-600 flex items-center gap-1">
             <TrendingUp className="w-3 h-3" />
             +8.2% from last week
@@ -194,8 +195,9 @@ export function Dashboard({ businessId }: DashboardProps) {
                 type="monotone" 
                 dataKey="revenue" 
                 stroke="var(--color-revenue)" 
+                fill="var(--color-revenue)"
+                fillOpacity={0.3}
                 strokeWidth={2} 
-                dot={{ fill: "var(--color-sales)", r: 4 }} 
               />
             </AreaChart>
           </ChartContainer>
