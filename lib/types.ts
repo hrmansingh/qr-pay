@@ -9,6 +9,7 @@ export interface Product {
   id: string
   name: string
   base_price: number
+  currency: string
   created_at: string
 }
 
@@ -114,6 +115,7 @@ export interface CreateBusinessRequest {
 export interface CreateProductRequest {
   name: string
   base_price: number
+  currency?: string
 }
 
 export interface AssignProductRequest {

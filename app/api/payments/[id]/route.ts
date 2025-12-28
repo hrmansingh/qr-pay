@@ -3,9 +3,10 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const { data: payment, error } = await supabaseAdmin
       .from('payments')
       .select(`
@@ -13,7 +14,7 @@ export async function GET(
         businesses(name, owner_id),
         products(name, base_price)
       `)
-      .eq('id', params.id)
+      .eq('id', id)
       .single()
 
     if (error) {

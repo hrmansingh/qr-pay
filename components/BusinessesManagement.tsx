@@ -62,7 +62,7 @@ export function BusinessesManagement({ userBusinesses }: BusinessesManagementPro
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Revenue</p>
-                    <p className="text-lg font-semibold text-blue-600">$0</p>
+                    <p className="text-lg font-semibold text-blue-600">₹0</p>
                   </div>
                 </div>
 

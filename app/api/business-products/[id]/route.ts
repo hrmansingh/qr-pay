@@ -3,9 +3,10 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
     
     if (body.price_override !== undefined && body.price_override < 0) {
@@ -18,7 +19,7 @@ export async function PUT(
     const { data: businessProduct, error } = await supabaseAdmin
       .from('business_products')
       .update({ price_override: body.price_override })
-      .eq('id', params.id)
+      .eq('id', id)
       .select(`
         *,
         businesses(name),
@@ -46,13 +47,14 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const { error } = await supabaseAdmin
       .from('business_products')
       .delete()
-      .eq('id', params.id)
+      .eq('id', id)
 
     if (error) {
       console.error('Error removing product from business:', error)

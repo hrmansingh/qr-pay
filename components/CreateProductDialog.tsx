@@ -26,6 +26,9 @@ export function CreateProductDialog({ businessId, onProductCreated }: CreateProd
   const [price, setPrice] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Fixed currency to INR (Indian Rupee)
+  const currency = "INR";
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -38,6 +41,7 @@ export function CreateProductDialog({ businessId, onProductCreated }: CreateProd
       await api.products.create({
         name,
         base_price: parseFloat(price),
+        currency,
         // business_id: businessId // TODO: Update API to handle this relation
       });
       
@@ -65,7 +69,7 @@ export function CreateProductDialog({ businessId, onProductCreated }: CreateProd
         <DialogHeader>
           <DialogTitle>Add New Product</DialogTitle>
           <DialogDescription>
-            Add a product to your catalog.
+            Add a product to your catalog with pricing in Indian Rupees (₹).
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
@@ -81,21 +85,27 @@ export function CreateProductDialog({ businessId, onProductCreated }: CreateProd
               required
             />
           </div>
+          
           <div className="space-y-2">
             <label htmlFor="price" className="text-sm font-medium">
-              Price
+              Price (₹)
             </label>
-            <Input
-              id="price"
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder="0.00"
-              step="0.01"
-              min="0"
-              required
-            />
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-mono">₹</span>
+              <Input
+                id="price"
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="0.00"
+                step="0.01"
+                min="0"
+                className="pl-8"
+                required
+              />
+            </div>
           </div>
+          
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel

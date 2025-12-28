@@ -23,8 +23,6 @@ export async function generateQRCode(data: QRCodeData): Promise<string> {
     // Generate QR code as base64 data URL
     const qrCodeDataURL = await QRCode.toDataURL(upiIntent, {
       errorCorrectionLevel: 'M',
-      type: 'image/png',
-      quality: 0.92,
       margin: 1,
       color: {
         dark: '#000000',
@@ -53,8 +51,6 @@ export async function generateQRCodeBuffer(data: QRCodeData): Promise<Buffer> {
   try {
     const qrCodeBuffer = await QRCode.toBuffer(upiIntent, {
       errorCorrectionLevel: 'M',
-      type: 'png',
-      quality: 0.92,
       margin: 1,
       color: {
         dark: '#000000',

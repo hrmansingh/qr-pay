@@ -49,7 +49,8 @@ export async function POST(request: NextRequest) {
       .from('products')
       .insert([{
         name: body.name,
-        base_price: body.base_price
+        base_price: body.base_price,
+        currency: body.currency || 'INR'
       }])
       .select()
       .single()
