@@ -42,7 +42,7 @@ export function CreateProductDialog({ businessId, onProductCreated }: CreateProd
         name,
         base_price: parseFloat(price),
         currency,
-        // business_id: businessId // TODO: Update API to handle this relation
+        business_id: businessId 
       });
       
       setOpen(false);

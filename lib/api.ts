@@ -48,7 +48,7 @@ export const api = {
   },
 
   products: {
-    create: async (data: { name: string; base_price: number; currency?: string }) => {
+    create: async (data: { name: string; base_price: number; currency?: string; business_id?: string }) => {
       const response = await fetch('/api/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
